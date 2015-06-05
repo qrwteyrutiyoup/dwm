@@ -1,0 +1,38 @@
+#!/bin/bash
+
+colour_gry="\x01" # grey on black
+colour_wht="\x02" # white on black
+colour_dgry="\x04" # darkgrey on black
+colour_blk="\x05" # black on darkgrey
+colour_red="\x06" # colour_red on black
+colour_grn="\x07" # green on black
+colour_dylw="\x08" # orange on black
+colour_ylw="\x09" # yellow on black
+colour_blu="\x0A" # colour_blue on darkgrey
+colour_mag="\x0B" # colour_magenta on darkgrey
+colour_cyn="\x0C" # cyan on darkgrey
+
+print_volume() {
+  volume="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
+  echo -ne "${colour_dylw}${colour_dgry} VOL:${volume}% "
+}
+
+print_bat() {
+    BATT=$( acpi -b | sed 's/.*[charging|unknown], \([0-9]*\)%.*/\1/gi' )
+    STATUS=$( acpi -b | sed 's/.*: \([a-zA-Z]*\),.*/\1/gi' )
+    if ([ $BATT -le 5 ] && [ $STATUS == 'Discharging' ]); then
+        # Beep
+        echo -e "\007" >/dev/tty10 && sleep 0.2
+        echo -e "\007" >/dev/tty10 && sleep 0.2
+        echo -e "\007" >/dev/tty10 && sleep 0.2
+        # Blink
+        echo 'on' > /proc/acpi/ibm/light && sleep 1
+        echo 'off' > /proc/acpi/ibm/light
+    fi
+  echo -ne "${colour_grn}${colour_wht} ${BATT}% ${STATUS} "
+}
+
+while true; do
+  xsetroot -name "$(print_volume) $(print_bat)"
+  sleep 60
+done
