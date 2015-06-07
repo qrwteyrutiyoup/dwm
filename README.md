@@ -1,4 +1,4 @@
-# dwm
+# dwm - Solarized
 
 My dwm setup with statusbar script. Solarized-dark colors!
 
