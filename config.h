@@ -8,21 +8,32 @@ static const char font[]            = "DejaVu Sans Mono for Powerline:size=9";
 #define NUMCOLORS 14
 static const char colors[NUMCOLORS][ColLast][21] = {
 	/* border   foreground  background   index|hex  description */
-	{ "#282a2e", "#bcbcbc", "#586e75" }, // 00|01 = normal
+	{ "#282a2e", "#bcbcbc", "#586e75" }, // 00|01 = normal / lys grå / koksgrå
 	{ "#268bd2", "#ffffff", "#258bd2" }, // 01|02 = selected
 	{ "#282a2e", "#ffaf00", "#586e75" }, // 02|03 = urgent
 	{ "#282a2e", "#ffffff", "#586e75" }, // 03|04 = occupied
 	{ "#282a3e", "#585858", "#002b36" }, // 04|05 = layout symbol
-	{ "#282a2e", "#bcbcbc", "#002b36" }, // 05|06 = clock
-	{ "#282a2e", "#258bd2", "#586e75" }, // 06|07 = systray
-	{ "#268bd2", "#586e75", "#002b36" }, // 07|08 = status titles
-	{ "#282a2e", "#d7ff00", "#002b36" }, // 08|09 = status text
-	{ "#282a2e", "#ffaf00", "#002b36" }, // 09|0a = status urgent
-	{ "#282a2e", "#bcbcbc", "#586e75" }, // 10|0b = battery title
-	{ "#282a2e", "#d7ff00", "#586e75" }, // 11|0c = battery text
-	{ "#282a2e", "#ffaf00", "#585e75" }, // 12|0d = battery urgent
-	{ "#282a2e", "#586e75", "#002b36" }, // 13|0e = battery plsym
+	{ "#282a2e", "#ffaf00", "#002b36" }, // 05|06 = clock / orange /mørkeblå
+	{ "#282a2e", "#ffaf00", "#002236" }, // 06|07 = systray / hvid /orange
+	{ "#268bd2", "#000000", "#ffaf00" }, // 07|08 = status titles / sort / orange 
+	{ "#282a2e", "#258bd2", "#ffaf00" }, // 08|09 = status / lysblaa / orange 
+	{ "#282a2e", "#ffffff", "#258bd2" }, // 09|0a = status urgent / hvid / lys blå
+	{ "#282a2e", "#586e75", "#258bd2" }, // 10|0b = battery title / koksgrå / lysblå
+	{ "#282a2e", "#ffffff", "#586e75" }, // 11|0c = battery text / hvid / koksgrå
+	{ "#282a2e", "#d7ff00", "#586e75" }, // 12|0d = battery urgent / snot / koksgrå
+	{ "#282a2e", "#000000", "#d7ff00" }, // 13|0e = battery plsym / sort / snot 
 };
+
+
+/* #bcbcbc = lys grå
+ * #586e75 = koksgrå
+ * #258bd2 = lys blå
+ * #ffaf00 = orange
+ * #585858 = mellem grå
+ * #002236 = Mørke blå
+ * #d7ff00 = snot grøn
+ *
+ */
 
 
 static const unsigned int borderpx  = 1;        /* border pixel of windows */

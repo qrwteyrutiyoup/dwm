@@ -1,20 +1,37 @@
 #!/bin/bash
 
-colour_gry="\x01" # grey on black
-colour_wht="\x02" # white on black
-colour_dgry="\x04" # darkgrey on black
-colour_blk="\x05" # black on darkgrey
-colour_red="\x06" # colour_red on black
-colour_grn="\x07" # green on black
-colour_dylw="\x08" # orange on black
-colour_ylw="\x09" # yellow on black
-colour_blu="\x0A" # colour_blue on darkgrey
-colour_mag="\x0B" # colour_magenta on darkgrey
-colour_cyn="\x0C" # cyan on darkgrey
+# front_back
+colour_gry="\x01" # lys grå front/mellem grå back
+colour_wht="\x02" # hvid front/lys blå back
+colour_dgry="\x04" # hvid front/mellem grå back
+colour_blk="\x05" # mellem grå front/mørke blå back
+colour_red="\x06" # lås grå front/mørke blå back
+orange_morkblaa="\x07" # lys blå front/mellem grå back
+sort_orange="\x08" # mellem grå front/mørke blå back
+lysblaa_orange="\x09"
+hvid_lysblaa="\x0a"
+koks_lysblaa="\x0b"
+hvid_koks="\x0c"
+snot_koks="\x0d"
+sort_snot="\x0e"
+
+
+#${lysblaa_morkblaa}${hvid_lysblaa}
+
+print_online() {
+  online="$(ping -c 1 -q google.com >/dev/null 2>&1 && echo ONLINE || echo OFFLINE)"
+  echo -ne "${orange_morkblaa}${sort_orange} ${online}"
+}
+
 
 print_volume() {
   volume="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
-  echo -ne "${colour_dylw}${colour_dgry} VOL:${volume}% "
+  echo -ne "${lysblaa_orange}${hvid_lysblaa} VOL:${volume}% "
+}
+
+print_wifi() {
+	essid="$( iwgetid | awk '{ print $2 }' | sed 's/ESSID:"//' | sed 's/"//' )"
+	echo -ne "${snot_koks}${sort_snot}${essid}"
 }
 
 print_bat() {
@@ -29,10 +46,10 @@ print_bat() {
         echo 'on' > /proc/acpi/ibm/light && sleep 1
         echo 'off' > /proc/acpi/ibm/light
     fi
-  echo -ne "${colour_grn}${colour_wht} ${BATT}% ${STATUS} "
+  echo -ne "${koks_lysblaa}${hvid_koks} ${BATT}% ${STATUS} "
 }
 
 while true; do
-  xsetroot -name "$(print_volume) $(print_bat)"
-  sleep 60
+	xsetroot -name "$(print_online) $(print_volume) $(print_bat) $(print_wifi)"
+  sleep 15
 done
