@@ -30,7 +30,7 @@ static const unsigned int gappx     = 0;        /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
-static const Bool showsystray       = True;     /* False means no systray */
+static const Bool showsystray       = False;     /* False means no systray */
 static const char scratchpadname[]  = "Scratchpad";
 static const unsigned int systrayspacing = 10;
 
