@@ -31,7 +31,7 @@ print_volume() {
 
 print_wifi() {
 	essid="$( iwgetid | awk '{ print $2 }' | sed 's/ESSID:"//' | sed 's/"//' )"
-	echo -ne "${snot_koks}${sort_snot}${essid}"
+	echo -ne "${snot_koks}${sort_snot} ${essid} "
 }
 
 print_bat() {
