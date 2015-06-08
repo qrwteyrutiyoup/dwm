@@ -32,7 +32,6 @@ static const char colors[NUMCOLORS][ColLast][21] = {
  * #585858 = mellem grå
  * #002236 = Mørke blå
  * #d7ff00 = snot grøn
- *
  */
 
 
