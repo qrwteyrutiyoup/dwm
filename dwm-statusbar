@@ -51,5 +51,5 @@ print_bat() {
 
 while true; do
 	xsetroot -name "$(print_online) $(print_volume) $(print_bat) $(print_wifi)"
-  sleep 15
+  sleep 60
 done
