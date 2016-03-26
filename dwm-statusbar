@@ -23,6 +23,10 @@ print_online() {
   echo -ne "${orange_morkblaa}${sort_orange} ${online}"
 }
 
+print_somafm() {
+	somafm="$(echo ~/.somafm)"
+	echo -ne "${colour_gry}
+}
 
 print_volume() {
   volume="$(amixer get Master | tail -n1 | sed -r 's/.*\[(.*)%\].*/\1/')"
