@@ -25,7 +25,7 @@ print_online() {
 
 print_somafm() {
 	somafm="$(echo ~/.somafm)"
-	echo -ne "${colour_gry}
+	echo -ne "${orange_morkblaa}${sort_orange} ${online}"
 }
 
 print_volume() {
