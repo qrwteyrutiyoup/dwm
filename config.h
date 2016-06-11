@@ -93,7 +93,7 @@ static const Rule rules[] = {
 /* commands */
 static const char *dmenu[]	= { "dmenu_run", "-fn", font, "-nb", colors[0][ColBG], "-nf", colors[0][ColFG], "-sb", colors[1][ColBG], "-sf", colors[1][ColFG], NULL };
 static const char *scratchpad[] = { "urxvt", "-title", scratchpadname, "-geometry", "70x20", NULL };
-static const char *term[]	= { "xfce4-terminal", NULL };
+static const char *term[]	= { "st", "-e", "tmux" };
 static const char *volup[]	= { "amixer", "-q", "set", "Master", "5%+", NULL };
 static const char *voldown[]	= { "amixer", "-q", "set", "Master", "5%-", NULL };
 static const char *volmute[]	= { "amixer", "-q", "set", "Master", "toggle", NULL };
