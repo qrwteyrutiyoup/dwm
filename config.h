@@ -92,7 +92,7 @@ static const Rule rules[] = {
 
 /* commands */
 static const char *dmenu[]	= { "dmenu_run", "-fn", font, "-nb", colors[0][ColBG], "-nf", colors[0][ColFG], "-sb", colors[1][ColBG], "-sf", colors[1][ColFG], NULL };
-static const char *scratchpad[] = { "urxvt", "-title", scratchpadname, "-geometry", "70x20", NULL };
+static const char *scratchpad[] = { "st", "-g", "98x15", "-t", scratchpadname, "-e", "bash", NULL };
 static const char *term[]	= { "st", "-e", "tmux" };
 static const char *volup[]	= { "amixer", "-q", "set", "Master", "5%+", NULL };
 static const char *voldown[]	= { "amixer", "-q", "set", "Master", "5%-", NULL };
@@ -121,8 +121,8 @@ static Key keys[] = {
 	{ MODKEY,		XK_k,			    focusstack,     {.i = -1 } },
 	{ MODKEY,		XK_i,			    incnmaster,     {.i = +1 } },
 	{ MODKEY,		XK_d,			    incnmaster,     {.i = -1 } },
-	{ MODKEY,		XK_h,			    setmfact,       {.f = -0.05} },
-	{ MODKEY,		XK_l,			    setmfact,       {.f = +0.05} },
+	{ MODKEY,		XK_period,		    setmfact,       {.f = -0.05} },
+	{ MODKEY,		XK_minus,			    setmfact,       {.f = +0.05} },
 	{ MODKEY,		XK_Return,		    zoom,           {0} },
 	{ MODKEY,		XK_Tab,			    focusstack,     {.i = +1 } },
 	{ MODKEY,		XK_q,			    killclient,     {0} },
@@ -134,7 +134,7 @@ static Key keys[] = {
 	{ MODKEY,		XK_0,			    view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,	XK_0,			    tag,            {.ui = ~0 } },
 	{ MODKEY,		XK_comma,		    focusmon,       {.i = -1 } },
-	{ MODKEY,		XK_period,		    focusmon,       {.i = +1 } },
+	{ MODKEY,		XK_e,			    focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,	XK_comma,		    tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,	XK_period,		    tagmon,         {.i = +1 } },
 	TAGKEYS(		XK_1,			    0)
