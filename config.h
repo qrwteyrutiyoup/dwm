@@ -91,7 +91,7 @@ static const Rule rules[] = {
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
-static const char *dmenu[]	= { "dmenu_run", "-fn", font, "-nb", colors[0][ColBG], "-nf", colors[0][ColFG], "-sb", colors[1][ColBG], "-sf", colors[1][ColFG], NULL };
+static const char *dmenu[]	= { "dmenu_run", "-p", "$: ", "-fn", font, "-nb", "#002b36", "-nf", "#ffffff", "-sb", "#d7ff00", "-sf", "#000000", NULL };
 static const char *scratchpad[] = { "st", "-g", "98x15", "-t", scratchpadname, "-e", "bash", NULL };
 static const char *term[]	= { "st", "-e", "tmux" };
 static const char *volup[]	= { "amixer", "-q", "set", "Master", "5%+", NULL };
