@@ -30,7 +30,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -59,6 +58,7 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
+#define MAGIC_TAG_LEN 9
 
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 #define _NET_SYSTEM_TRAY_ORIENTATION_HORZ 0
@@ -85,7 +85,7 @@ enum { NetSupported, NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation,
        NetWMWindowTypeDialog, NetLast };     /* EWMH atoms */
 enum { Manager, Xembed, XembedInfo, XLast }; /* Xembed atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
-enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkClock,
+enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast };             /* clicks */
 
 typedef union {
@@ -509,7 +509,7 @@ buttonpress(XEvent *e) {
 	if(ev->window == selmon->barwin) {
 		i = x = 0;
 		do
-			x += TEXTW(tags[i].name);
+			x += TEXTW(tags[i].name) + MAGIC_TAG_LEN;
 		while(ev->x >= x && ++i < LENGTH(tags));
 		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
@@ -520,7 +520,7 @@ buttonpress(XEvent *e) {
 		else if(ev->x > selmon->ww - TEXTW(stext))
 			click = ClkStatusText;
 		else
-			click = ClkClock;
+			click = ClkWinTitle;
 	}
 	else if((c = wintoclient(ev->window))) {
 		focus(c);
@@ -847,9 +847,7 @@ dirtomon(int dir) {
 
 void
 drawbar(Monitor *m) {
-	int x, clockw;
-	time_t current;
-	char clock[38];
+	int x;
 	unsigned int i, occ = 0, urg = 0;
 	XftColor *col;
 	const char *sym;
@@ -880,12 +878,24 @@ drawbar(Monitor *m) {
 		drawtext(sym, col, False);
 		dc.x += dc.w;
 	}
+
+	dc.w = textnw(plopensym, strlen(plopensym));
+	drawtext(plopensym, dc.plcolors[1], False);
+	dc.x += dc.w;
+
+
 	dc.w = blw = TEXTW(m->ltsymbol);
 	drawtext(m->ltsymbol, dc.colors[4], True);
 	dc.x += dc.w;
-	dc.w = textnw(plopensym, strlen(plopensym));
-	drawtext(plopensym, dc.plcolors[3], False);
+
+    dc.w = textnw(plclosedsym, strlen(plclosedsym));
+	drawtext(plclosedsym, dc.plcolors[0], False);
 	dc.x += dc.w;
+
+	dc.w = textnw(plopensym, strlen(plopensym));
+	drawtext(plopensym, dc.plcolors[0], False);
+	dc.x += dc.w;
+
 	x = dc.x;
 	if(m == selmon) { /* status is only drawn on selected monitor */
 		dc.w = textnw(stext, strlen(stext));
@@ -906,14 +916,14 @@ drawbar(Monitor *m) {
 	else
 		dc.x = m->ww;
 	if((dc.w = dc.x - x) > bh) {
-		time(&current);
-		strftime(clock, 38, clock_fmt, localtime(&current));
-		clockw = TEXTW(clock);
 		dc.x = x;
-		drawtext(NULL, dc.colors[4], False);
-		dc.w = MIN(dc.w, clockw);
-		dc.x = MAX(dc.x, (m->mw / 2) - (clockw / 2));
-		drawtext(clock, dc.colors[5], False);
+       if(m->sel) {
+         col = m == selmon ? dc.colors[1] : dc.colors[0];
+		 drawtext(m->sel->name, col, True);
+       }
+       else
+		drawtext(NULL, dc.colors[0], False);
+
 	}
 	if(getsystraywidth() != 1) {
 		dc.x = m->ww - getsystraywidth() - textnw(plsystraysym, strlen(plsystraysym));
@@ -1514,8 +1524,11 @@ propertynotify(XEvent *e) {
 			drawbars();
 			break;
 		}
-		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName])
+		if(ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
+			if(c == c->mon->sel)
+				drawbar(c->mon);
+		}
 		if(ev->atom == netatom[NetWMWindowType])
 			updatewindowtype(c);
 	}
@@ -2601,6 +2614,27 @@ zoom(const Arg *arg) {
 			return;
 	pop(c);
 }
+
+/** Function to shift the current view to the left/right
+ *
+ * @param: "arg->i" stores the number of tags to shift right (positive value)
+ *          or left (negative value)
+ */
+void
+shiftview(const Arg *arg) {
+    Arg shifted;
+
+    if(arg->i > 0) // left circular shift
+        shifted.ui = (selmon->tagset[selmon->seltags] << arg->i)
+           | (selmon->tagset[selmon->seltags] >> (LENGTH(tags) - arg->i));
+
+    else // right circular shift
+        shifted.ui = selmon->tagset[selmon->seltags] >> (- arg->i)
+           | selmon->tagset[selmon->seltags] << (LENGTH(tags) + arg->i);
+
+    view(&shifted);
+}
+
 
 int
 main(int argc, char *argv[]) {
