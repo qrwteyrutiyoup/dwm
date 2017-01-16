@@ -20,24 +20,24 @@ void shiftview(const Arg*);
 
 #define NUMCOLORS 17
 static const char colors[NUMCOLORS][ColLast][21] = {
-	/* border   foreground  background   index|hex  description */
-	{ "#282a2e", "#bcbcbc", "#585858" }, // 00|01 = normal / lys grå / koksgrå
-	{ "#cfcfcf", "#585858", "#cfcfcf" }, // 09|0a = dark grey on white
+  /* border   foreground  background   index|hex  description */
+  { "#282a2e", "#bcbcbc", "#585858" }, // 00|01 = normal / lys grå / koksgrå
+  { "#cfcfcf", "#585858", "#cfcfcf" }, // 09|0a = dark grey on white
   { "#282a2e", "#ffaf00", "#586e75" }, // 02|03 = urgent
   { "#282a2e", "#ffffff", "#585858" }, // 03|04 = occupied
-	{ "#282a3e", "#585858", "#cfcfcf" }, // 04|05 = layout symbol
+  { "#282a3e", "#585858", "#cfcfcf" }, // 04|05 = layout symbol
   { "#282a2e", "#ffffff", "#585858" }, // 10|06 = white on dark grey
-	{ "#282a2e", "#ffffff", "#586e75" }, // 06|07 = white on grey
-	{ "#282a2e", "#5f0000", "#586e75" }, // 07|08 = red on grey
-	{ "#282a2e", "#ffffff", "#5f0000" }, // 08|09 = white on red
-	{ "#282a2e", "#585858", "#cfcfcf" }, // 09|0a = dark grey on white
-	{ "#282a2e", "#cfcfcf", "#585858" }, // 10|0b = white on dark grey
-	{ "#282a2e", "#ffaf00", "#303030" }, // 11|0c = orange on dark grey
-	{ "#282a2e", "#303030", "#ffaf00" }, // 12|0d = dark grey on orange
-	{ "#282a2e", "#054b19", "#ffaf00" }, // 13|0e = dark green on orange
-	{ "#282a2e", "#14a060", "#054b19" }, // 14|0f = green on dark green
-	{ "#282a2e", "#258bd2", "#054b19" }, // 15|10 = blue on dark green
-	{ "#282a2e", "#ffffff", "#258bd2" }, // 16|11 = white on blue
+  { "#282a2e", "#ffffff", "#586e75" }, // 06|07 = white on grey
+  { "#282a2e", "#5f0000", "#586e75" }, // 07|08 = red on grey
+  { "#282a2e", "#ffffff", "#5f0000" }, // 08|09 = white on red
+  { "#282a2e", "#585858", "#cfcfcf" }, // 09|0a = dark grey on white
+  { "#282a2e", "#cfcfcf", "#585858" }, // 10|0b = white on dark grey
+  { "#282a2e", "#ffaf00", "#303030" }, // 11|0c = orange on dark grey
+  { "#282a2e", "#303030", "#ffaf00" }, // 12|0d = dark grey on orange
+  { "#282a2e", "#054b19", "#ffaf00" }, // 13|0e = dark green on orange
+  { "#282a2e", "#14a060", "#054b19" }, // 14|0f = green on dark green
+  { "#282a2e", "#258bd2", "#054b19" }, // 15|10 = blue on dark green
+  { "#282a2e", "#ffffff", "#258bd2" }, // 16|11 = white on blue
 };
 
 
@@ -52,40 +52,40 @@ static const unsigned int systrayspacing = 10;
 
 //static const char clock_fmt[] = "%d/%m %H:%M";
 
-static const char plopensym[]	 = "";	    /* powerline: left open glyph */
-static const char plclosedsym[]	 = "";	    /* powerline: left closed glyph */
-static const char plsystraysym[] = " ";	    /* powerline: right closed glyph */
+static const char plopensym[]   = "";      /* powerline: left open glyph */
+static const char plclosedsym[]   = "";      /* powerline: left closed glyph */
+static const char plsystraysym[] = " ";      /* powerline: right closed glyph */
 
 /* layout(s) */
-static const float mfact      = 0.50;	/* factor of master area size [0.05..0.95] */
-static const int nmaster      = 1;	/* number of clients in master area */
-static const Bool resizehints = False;	/* True means respect size hints in tiled resizals */
+static const float mfact      = 0.50;  /* factor of master area size [0.05..0.95] */
+static const int nmaster      = 1;  /* number of clients in master area */
+static const Bool resizehints = False;  /* True means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
-	/* symbol   gaps    arrange function */
-	{ "  ",    True,   tile },    /* first entry is default */
-	{ "[M]",    False,  monocle },
-	{ "  ",    False,  NULL },    /* no layout function means floating behavior */
+  /* symbol   gaps    arrange function */
+  { "  ",    True,   tile },    /* first entry is default */
+  { "[M]",    False,  monocle },
+  { "  ",    False,  NULL },    /* no layout function means floating behavior */
 };
 
 /* tagging */
 static Tag tags[] = {
-	/* name     layout      mfact   nmaster */
-	{ "F",    &layouts[0], -1,    -1 },
-	{ "O",    &layouts[0], -1,    -1 },
-	{ "R",    &layouts[0], -1,    -1 },
-	{ "A",    &layouts[0], -1,    -1 },
-	{ "T",    &layouts[0], -1,    -1 },
-	{ "E",    &layouts[0], -1,    -1 },
-	{ "M",    &layouts[0], -1,    -1 },
-	{ "E",    &layouts[0], -1,    -1 },
-	{ "R",    &layouts[0], -1,    -1 },
+  /* name     layout      mfact   nmaster */
+  { "F",    &layouts[0], -1,    -1 },
+  { "O",    &layouts[0], -1,    -1 },
+  { "R",    &layouts[0], -1,    -1 },
+  { "A",    &layouts[0], -1,    -1 },
+  { "T",    &layouts[0], -1,    -1 },
+  { "E",    &layouts[0], -1,    -1 },
+  { "M",    &layouts[0], -1,    -1 },
+  { "E",    &layouts[0], -1,    -1 },
+  { "R",    &layouts[0], -1,    -1 },
 };
 
 static const Rule rules[] = {
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Chromium", NULL,       NULL,       1 << 3,       False,       -1 },
-	{ "Skype",    NULL,       NULL,       0,	    True,	 -1 },
+  /* class      instance    title       tags mask     isfloating   monitor */
+  { "Chromium", NULL,       NULL,       1 << 3,       False,       -1 },
+  { "Skype",    NULL,       NULL,       0,      True,   -1 },
 };
 
 
