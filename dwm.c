@@ -52,7 +52,7 @@
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
-#define MAXCOLORS		21
+#define MAXCOLORS	21
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
@@ -872,7 +872,7 @@ drawbar(Monitor *m) {
 		}
 		else {
 			sym = !(m->tagset[m->seltags] & 1 << i) ^ !(m->tagset[m->seltags] & 1 << (i + 1)) ? plclosedsym : plopensym;
-			col = dc.plcolors[m->tagset[m->seltags] & 1 << (i + 1) ? 1 : m->tagset[m->seltags] & 1 << i ? 2 : 0];
+			col = dc.plcolors[m->tagset[m->seltags] & 1 << (i + 1) ? 1 : m->tagset[m->seltags] & 1 << i ? 2 : 2];
 		}
 		dc.w = textnw(sym, strlen(sym));
 		drawtext(sym, col, False);
@@ -889,15 +889,16 @@ drawbar(Monitor *m) {
 	dc.x += dc.w;
 
     dc.w = textnw(plclosedsym, strlen(plclosedsym));
-	drawtext(plclosedsym, dc.plcolors[0], False);
+	drawtext(plclosedsym, dc.plcolors[2], False);
 	dc.x += dc.w;
 
-	dc.w = textnw(plopensym, strlen(plopensym));
-	drawtext(plopensym, dc.plcolors[0], False);
+	dc.w = textnw(layoutsym, strlen(layoutsym));
+	drawtext(layoutsym, dc.plcolors[2], False);
 	dc.x += dc.w;
 
 	x = dc.x;
 	if(m == selmon) { /* status is only drawn on selected monitor */
+        fprintf(stderr, "stext: %s, len: %d\n", stext, strlen(stext));
 		dc.w = textnw(stext, strlen(stext));
 		dc.x = m->ww - dc.w;
 		if(showsystray && m == selmon) {
@@ -919,6 +920,7 @@ drawbar(Monitor *m) {
 		dc.x = x;
        if(m->sel) {
          col = m == selmon ? dc.colors[1] : dc.colors[0];
+         fprintf(stderr, "sel->name: %s\n", m->sel->name);
 		 drawtext(m->sel->name, col, True);
        }
        else
@@ -1038,7 +1040,7 @@ focus(Client *c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-		XSetWindowBorder(dpy, c->win, dc.colors[1][ColBorder].pixel);
+		XSetWindowBorder(dpy, c->win, dc.colors[2][ColBorder].pixel);
 		setfocus(c);
 	}
 	else
@@ -1881,7 +1883,7 @@ setup(void) {
 	dc.plcolors[0][ColFG] = getcolor(colors[0][ColFG]);
 	dc.plcolors[0][ColBG] = getcolor(colors[0][ColBG]);
 	int fg[5] = {0, 1, 3, 1, 6};
-	int bg[5] = {1, 0, 4, 4, 10};
+	int bg[5] = {1, 0, 4, 4, 6};
 	for(int i = 0; i < 5; i++) {
 		dc.plcolors[i+1][ColBorder] = getcolor(colors[0][ColBorder]);
 		dc.plcolors[i+1][ColFG] = getcolor(colors[fg[i]][ColBG]);
