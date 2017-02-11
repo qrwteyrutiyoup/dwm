@@ -16,29 +16,22 @@ static const char dmenufont[]       = "monospace:size=10";
 struct Arg;
 void shiftview(const Arg*);
 
-#define DARK "#3f6379"
-#define LITE "#f4feff"
-#define URGT "#ae0001"
-#define BUSY "#85ddfd"
+#define THEME_FILE "current-theme"
+
 #define BORDER "#bcbcbc"
+#define URGT "#ae0001"
+#define DARK "#5a440a"
+#define LITE "#c2b276"
+#define BUSY "#818855"
 
-
-/*
-#define DARK "#310600"
-#define LITE "#fffddc"
-#define BUSY "#ceca2b"
-*/
-
-#define NUMCOLORS 7
+#define NUMCOLORS 6
 static const char colors[NUMCOLORS][ColLast][21] = {
 	/* border   foreground  background   index|hex  description */
-	{ BORDER, BORDER, DARK }, // 00|01 = normal / lys grå / koksgrå
-	{ DARK, DARK, LITE }, // 01|02 = dark grey on white
-  { DARK, URGT, DARK }, // 02|03 = urgent
-  { DARK, BUSY, DARK }, // 03|04 = occupied
-	{ DARK, DARK, LITE }, // 04|05 = layout symbol
-	{ DARK, DARK, LITE }, // 05|06 = dark grey on white
-	{ DARK, LITE, DARK }, // 06|07 = white on dark grey
+	{ BORDER, BORDER, DARK }, // 00|01
+  { BORDER, URGT, DARK },   // 01|02
+  { BORDER, BUSY, DARK },   // 02|03
+	{ BORDER, DARK, LITE },   // 03|04
+	{ BORDER, LITE, DARK },   // 04|05
 };
 
 
@@ -65,9 +58,9 @@ static const Bool resizehints = False;	/* True means respect size hints in tiled
 
 static const Layout layouts[] = {
 	/* symbol   gaps    arrange function */
-	{ "  ",    True,   tile },    /* first entry is default */
+	{ " ",    True,   tile },    /* first entry is default */
 	{ "[M]",    False,  monocle },
-	{ "  ",    False,  NULL },    /* no layout function means floating behavior */
+	{ " ",    False,  NULL },    /* no layout function means floating behavior */
 };
 
 static const Rule rules[] = {
@@ -82,7 +75,7 @@ static Tag tags[] = {
   /* name     layout      mfact   nmaster */
   { " ",    &layouts[0], -1,    -1 },
   { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
   { " ",    &layouts[0], -1,    -1 },
   { " ",    &layouts[0], -1,    -1 },
   { " ",    &layouts[0], -1,    -1 },

@@ -42,6 +42,7 @@
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
+#include <pwd.h>
 
 /* macros */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
@@ -122,8 +123,7 @@ struct Client {
 
 typedef struct {
 	int x, y, w, h;
-	XftColor colors[MAXCOLORS][ColLast];
-	XftColor plcolors[6][ColLast];
+	XftColor plcolors[MAXCOLORS][ColLast];
 	Drawable drawable;
 	GC gc;
 	struct {
@@ -862,17 +862,17 @@ drawbar(Monitor *m) {
 	dc.x = 0;
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i].name);
-		col = dc.colors[(m->tagset[m->seltags] & 1 << i) ? 1 : (urg & 1 << i ? 2 : (occ & 1 << i ? 3 : 0))];
+		col = dc.plcolors[(m->tagset[m->seltags] & 1 << i) ? 3 : (urg & 1 << i ? 1 : (occ & 1 << i ? 2 : 0))];
 		drawtext(tags[i].name, col, True);
 		dc.x += dc.w;
 
 		if(i == LENGTH(tags) - 1) {
 			sym = plclosedsym;
-			col = dc.plcolors[m->tagset[m->seltags] & 1 << i ? 4 : 3];
+			col = dc.plcolors[m->tagset[m->seltags] & 1 << i ? 5 : 3];
 		}
 		else {
 			sym = !(m->tagset[m->seltags] & 1 << i) ^ !(m->tagset[m->seltags] & 1 << (i + 1)) ? plclosedsym : plopensym;
-			col = dc.plcolors[m->tagset[m->seltags] & 1 << (i + 1) ? 1 : m->tagset[m->seltags] & 1 << i ? 2 : 2];
+			col = dc.plcolors[m->tagset[m->seltags] & 1 << (i + 1) ? 3 : 4];
 		}
 		dc.w = textnw(sym, strlen(sym));
 		drawtext(sym, col, False);
@@ -880,25 +880,24 @@ drawbar(Monitor *m) {
 	}
 
 	dc.w = textnw(plopensym, strlen(plopensym));
-	drawtext(plopensym, dc.plcolors[1], False);
+	drawtext(plopensym, dc.plcolors[3], False);
 	dc.x += dc.w;
 
 
 	dc.w = blw = TEXTW(m->ltsymbol);
-	drawtext(m->ltsymbol, dc.colors[4], True);
+	drawtext(m->ltsymbol, dc.plcolors[3], True);
 	dc.x += dc.w;
 
     dc.w = textnw(plclosedsym, strlen(plclosedsym));
-	drawtext(plclosedsym, dc.plcolors[2], False);
+	drawtext(plclosedsym, dc.plcolors[4], False);
 	dc.x += dc.w;
 
 	dc.w = textnw(layoutsym, strlen(layoutsym));
-	drawtext(layoutsym, dc.plcolors[2], False);
+	drawtext(layoutsym, dc.plcolors[4], False);
 	dc.x += dc.w;
 
 	x = dc.x;
 	if(m == selmon) { /* status is only drawn on selected monitor */
-        fprintf(stderr, "stext: %s, len: %d\n", stext, strlen(stext));
 		dc.w = textnw(stext, strlen(stext));
 		dc.x = m->ww - dc.w;
 		if(showsystray && m == selmon) {
@@ -919,12 +918,11 @@ drawbar(Monitor *m) {
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
        if(m->sel) {
-         col = m == selmon ? dc.colors[1] : dc.colors[0];
-         fprintf(stderr, "sel->name: %s\n", m->sel->name);
+         col = m == selmon ? dc.plcolors[3] : dc.plcolors[0];
 		 drawtext(m->sel->name, col, True);
        }
        else
-		drawtext(NULL, dc.colors[0], False);
+		drawtext(NULL, dc.plcolors[0], False);
 
 	}
 	if(getsystraywidth() != 1) {
@@ -947,7 +945,7 @@ drawbars(void) {
 void
 drawcoloredtext(char *text) {
 	char *buf = text, *ptr = buf, c = 1;
-	XftColor *col = dc.colors[0];
+	XftColor *col = dc.plcolors[0];
 	int i, ox = dc.x;
 
 	while(*ptr) {
@@ -962,7 +960,7 @@ drawcoloredtext(char *text) {
 			dc.x += textnw(buf, i);
 		}
 		*ptr = c;
-		col = dc.colors[c-1];
+		col = dc.plcolors[c-1];
 		buf = ++ptr;
 	}
 	drawtext(buf, col, False);
@@ -1040,7 +1038,7 @@ focus(Client *c) {
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, True);
-		XSetWindowBorder(dpy, c->win, dc.colors[2][ColBorder].pixel);
+		XSetWindowBorder(dpy, c->win, dc.plcolors[2][ColBorder].pixel);
 		setfocus(c);
 	}
 	else
@@ -1120,9 +1118,20 @@ getatomprop(Client *c, Atom prop) {
 
 XftColor
 getcolor(const char *colstr) {
+    fprintf(stderr, "called getcolor() for %s\n", colstr);
+
+    XColor xcolor;
+    XRenderColor xrcolor;
 	XftColor color;
 
-	if(!XftColorAllocName(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), colstr, &color))
+    XParseColor(dpy, DefaultColormap(dpy, screen), colstr, &xcolor);
+
+    xrcolor.red = xcolor.red;
+    xrcolor.blue = xcolor.blue;
+    xrcolor.green = xcolor.green;
+    xrcolor.alpha = USHRT_MAX;
+
+    if (!XftColorAllocValue(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), &xrcolor, &color))
 		die("error, cannot allocate color '%s'\n", colstr);
 	return color;
 }
@@ -1331,7 +1340,7 @@ manage(Window w, XWindowAttributes *wa) {
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, dc.colors[0][ColBorder].pixel);
+	XSetWindowBorder(dpy, w, dc.plcolors[0][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
 	updatesizehints(c);
@@ -1836,12 +1845,75 @@ setmfact(const Arg *arg) {
 	arrange(selmon);
 }
 
+static void update_xftcolor(XftColor* color, const char* colorstr)
+{
+    XftColorFree(dpy, DefaultVisual(dpy, screen), DefaultColormap(dpy, screen), color);
+    *color = getcolor(colorstr);
+}
+
+void theme_handler(int unused)
+{
+    signal(SIGUSR1, theme_handler);
+
+    char filename[255];
+    const char* homedir;
+    if ((homedir = getenv("HOME")) == NULL) {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+    snprintf(filename, sizeof(filename), "%s/.dwm/%s", homedir, THEME_FILE);
+
+    FILE *fp;
+
+    if ((fp = fopen(filename, "r")) == NULL) {
+        fprintf(stderr, "Could not read theme file '%s'\n", filename);
+        return;
+    }
+
+    char color_dark[8];
+    char color_lite[8];
+    char color_busy[8];
+    char color_urgent[8];
+    char color_border[8];
+    int num_colors;
+
+    num_colors = fscanf(fp, "%s %s %s %s %s\n", color_dark, color_lite, color_busy, color_urgent, color_border);
+    fclose(fp);
+
+    if (num_colors != 5) {
+        return;
+    }
+
+    enum {COLOR_DARK, COLOR_LITE, COLOR_BUSY, COLOR_URGENT, COLOR_BORDER};
+
+	int new_colors[MAXCOLORS][ColLast] = {
+        {COLOR_BORDER, COLOR_BORDER, COLOR_DARK},
+        {COLOR_BORDER, COLOR_URGENT, COLOR_DARK},
+        {COLOR_BORDER, COLOR_BUSY, COLOR_DARK},
+        {COLOR_BORDER, COLOR_DARK, COLOR_LITE},
+        {COLOR_BORDER, COLOR_LITE, COLOR_DARK},
+        {COLOR_BORDER, COLOR_LITE, COLOR_LITE}
+    };
+
+	char* replacement_colors[MAXCOLORS] = {
+		color_dark, color_lite, color_busy, color_urgent, color_border
+	};
+
+	for (int i = 0; i < NUMCOLORS; i++) {
+        update_xftcolor(&dc.plcolors[i][ColBorder], replacement_colors[new_colors[i][ColBorder]]);
+        update_xftcolor(&dc.plcolors[i][ColFG], replacement_colors[new_colors[i][ColFG]]);
+        update_xftcolor(&dc.plcolors[i][ColBG], replacement_colors[new_colors[i][ColBG]]);
+	}
+}
+
 void
 setup(void) {
 	XSetWindowAttributes wa;
 
 	/* clean up any zombies immediately */
 	sigchld(0);
+
+    /* set up theme handler. */
+    signal(SIGUSR1, theme_handler);
 
 	/* init screen */
 	screen = DefaultScreen(dpy);
@@ -1875,19 +1947,9 @@ setup(void) {
 	cursor[CurMove] = XCreateFontCursor(dpy, XC_fleur);
 	/* init appearance */
 	for(int i = 0; i < NUMCOLORS; i++) {
-		dc.colors[i][ColBorder] = getcolor(colors[i][ColBorder]);
-		dc.colors[i][ColFG] = getcolor(colors[i][ColFG]);
-		dc.colors[i][ColBG] = getcolor(colors[i][ColBG]);
-	}
-	dc.plcolors[0][ColBorder] = getcolor(colors[0][ColBorder]);
-	dc.plcolors[0][ColFG] = getcolor(colors[0][ColFG]);
-	dc.plcolors[0][ColBG] = getcolor(colors[0][ColBG]);
-	int fg[5] = {0, 1, 3, 1, 6};
-	int bg[5] = {1, 0, 4, 4, 6};
-	for(int i = 0; i < 5; i++) {
-		dc.plcolors[i+1][ColBorder] = getcolor(colors[0][ColBorder]);
-		dc.plcolors[i+1][ColFG] = getcolor(colors[fg[i]][ColBG]);
-		dc.plcolors[i+1][ColBG] = getcolor(colors[bg[i]][ColBG]);
+		dc.plcolors[i][ColBorder] = getcolor(colors[i][ColBorder]);
+		dc.plcolors[i][ColFG] = getcolor(colors[i][ColFG]);
+		dc.plcolors[i][ColBG] = getcolor(colors[i][ColBG]);
 	}
 	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen), bh, DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, NULL);
@@ -2123,7 +2185,7 @@ unfocus(Client *c, Bool setfocus) {
 	if(!c)
 		return;
 	grabbuttons(c, False);
-	XSetWindowBorder(dpy, c->win, dc.colors[0][ColBorder].pixel);
+	XSetWindowBorder(dpy, c->win, dc.plcolors[0][ColBorder].pixel);
 	if(setfocus)
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 }
@@ -2429,11 +2491,11 @@ updatesystray(void) {
 		/* init systray */
 		if(!(systray = (Systray *)calloc(1, sizeof(Systray))))
 			die("fatal: could not malloc() %u bytes\n", sizeof(Systray));
-		systray->win = XCreateSimpleWindow(dpy, root, x, selmon->by, w, bh, 0, 0, dc.colors[1][ColBG].pixel);
+		systray->win = XCreateSimpleWindow(dpy, root, x, selmon->by, w, bh, 0, 0, dc.plcolors[1][ColBG].pixel);
 		wa.event_mask	     = ButtonPressMask | ExposureMask;
 		wa.override_redirect = True;
 		wa.background_pixmap = ParentRelative;
-		wa.background_pixel  = dc.colors[6][ColBG].pixel;
+		wa.background_pixel  = dc.plcolors[6][ColBG].pixel;
 		XSelectInput(dpy, systray->win, SubstructureNotifyMask);
 		XChangeProperty(dpy, systray->win, netatom[NetSystemTrayOrientation], XA_CARDINAL, 32,
 				PropModeReplace, (unsigned char *)&systrayorientation, 1);
@@ -2463,9 +2525,9 @@ updatesystray(void) {
 	x -= w;
 
 	if(w != 1)
-		wa.background_pixel = dc.colors[6][ColBG].pixel;
+		wa.background_pixel = dc.plcolors[6][ColBG].pixel;
 	else
-		wa.background_pixel = dc.colors[0][ColBG].pixel;
+		wa.background_pixel = dc.plcolors[0][ColBG].pixel;
 	XChangeWindowAttributes(dpy, systray->win, CWBackPixel, &wa);
 
 	XMoveResizeWindow(dpy, systray->win, x, selmon->by, w, bh);
@@ -2496,7 +2558,7 @@ updatewmhints(Client *c) {
 		else {
 			c->isurgent = (wmh->flags & XUrgencyHint) ? True : False;
 			if(c->isurgent)
-				XSetWindowBorder(dpy, c->win, dc.colors[2][ColBorder].pixel);
+				XSetWindowBorder(dpy, c->win, dc.plcolors[1][ColBorder].pixel);
 		}
 		if(wmh->flags & InputHint)
 			c->neverfocus = !wmh->input;
