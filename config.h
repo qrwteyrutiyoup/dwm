@@ -27,7 +27,7 @@ void shiftview(const Arg*);
 #define NUMCOLORS 6
 static const char colors[NUMCOLORS][ColLast][21] = {
 	/* border   foreground  background   index|hex  description */
-	{ BORDER, BORDER, DARK }, // 00|01
+	{ BORDER, BORDER, BORDER }, // 00|01
   { BORDER, URGT, DARK },   // 01|02
   { BORDER, BUSY, DARK },   // 02|03
 	{ BORDER, DARK, LITE },   // 03|04
@@ -35,7 +35,7 @@ static const char colors[NUMCOLORS][ColLast][21] = {
 };
 
 
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 3;        /* border pixel of windows */
 static const unsigned int gappx     = 0;        /* gap pixel between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const Bool showbar           = True;     /* False means no bar */
@@ -48,7 +48,20 @@ static const unsigned int systrayspacing = 10;
 
 static const char plopensym[]	 = "";	    /* powerline: left open glyph */
 static const char layoutsym[]	 = " ";	    /* powerline: left open glyph */
+static const char leftlayoutsym[]	 = "";	    /* powerline: left open glyph */
+static const char leftthinsym[]	 = "";	    /* powerline: left open glyph */
+static const char lefttagsym[] = "";
+
+
+static const char rightlayoutsym[]	 = "";	    /* powerline: left open glyph */
+static const char rightthinsym[]	 = "";	    /* powerline: left open glyph */
+
+
+
+
+//static const char plclosedsym[]	 = "";	    /* powerline: left closed glyph */
 static const char plclosedsym[]	 = "";	    /* powerline: left closed glyph */
+
 static const char plsystraysym[] = " ";	    /* powerline: right closed glyph */
 
 /* layout(s) */
@@ -58,9 +71,9 @@ static const Bool resizehints = False;	/* True means respect size hints in tiled
 
 static const Layout layouts[] = {
 	/* symbol   gaps    arrange function */
-	{ " ",    True,   tile },    /* first entry is default */
+	{ "",    True,   tile },    /* first entry is default */
 	{ "[M]",    False,  monocle },
-	{ " ",    False,  NULL },    /* no layout function means floating behavior */
+	{ "",    False,  NULL },    /* no layout function means floating behavior */
 };
 
 static const Rule rules[] = {
@@ -73,15 +86,15 @@ static const Rule rules[] = {
 /* tagging */
 static Tag tags[] = {
   /* name     layout      mfact   nmaster */
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { "",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
-  { " ",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
+//  { "",    &layouts[0], -1,    -1 }, // kde
+  { "",    &layouts[0], -1,    -1 },
+//  { " ",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
+  { "",    &layouts[0], -1,    -1 },
 /*	{ "1",   &layouts[0], -1,    -1 },
 	{ "2",   &layouts[0], -1,    -1 },
 	{ "3",   &layouts[0], -1,    -1 },
@@ -191,8 +204,8 @@ static Key keys[] = {
   TAGKEYS(                   XK_5,                      4)
   TAGKEYS(                   XK_6,                      5)
   TAGKEYS(                   XK_7,                      6)
-  TAGKEYS(                   XK_8,                      7)
-  TAGKEYS(                   XK_9,                      8)
+//  TAGKEYS(                   XK_8,                      7)
+//  TAGKEYS(                   XK_9,                      8)
   { MODKEY|ShiftMask,        XK_q,           quit,           {0} },
 }
 ;

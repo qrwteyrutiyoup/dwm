@@ -11,7 +11,7 @@
  * in O(1) time.
  *
  * Each child of the root window is called a client, except windows which have
- * set the override_redirect flag.  Clients are organized in a linked client
+* set the override_redirect flag.  Clients are organized in a linked client
  * list on each monitor, the focus history is remembered through a stack list
  * on each monitor. Each client contains a bit array to indicate the tags of a
  * client.
@@ -59,6 +59,8 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (textnw(X, strlen(X)) + dc.font.height)
+#define BAR_OFFSET 81
+#define LT_OFFSET 25
 #define MAGIC_TAG_LEN 9
 
 #define SYSTEM_TRAY_REQUEST_DOCK    0
@@ -337,6 +339,7 @@ static DC dc;
 static Monitor *mons = NULL, *selmon = NULL;
 static Window root;
 static int gap;
+static const char *tagsym;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -507,15 +510,19 @@ buttonpress(XEvent *e) {
 		focus(NULL);
 	}
 	if(ev->window == selmon->barwin) {
-		i = x = 0;
+		i = 0;
+        x = BAR_OFFSET + textnw(tagsym, strlen(tagsym));
+
 		do
 			x += TEXTW(tags[i].name) + MAGIC_TAG_LEN;
 		while(ev->x >= x && ++i < LENGTH(tags));
+
 		if(i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
 		}
-		else if(ev->x < x + blw)
+
+		else if(ev->x >= x + LT_OFFSET && ev->x < x + blw + LT_OFFSET + TEXTW(" "))
 			click = ClkLtSymbol;
 		else if(ev->x > selmon->ww - TEXTW(stext))
 			click = ClkStatusText;
@@ -859,10 +866,18 @@ drawbar(Monitor *m) {
 		if(c->isurgent)
 			urg |= c->tags;
 	}
-	dc.x = 0;
+
+	dc.x = BAR_OFFSET;
+
+    col = dc.plcolors[4];
+    tagsym = (m->tagset[m->seltags] & 1 << 0) ? leftlayoutsym : lefttagsym;
+    dc.w = textnw(tagsym, strlen(tagsym));
+    drawtext(tagsym, col, False);
+    dc.x += dc.w;
+
 	for(i = 0; i < LENGTH(tags); i++) {
 		dc.w = TEXTW(tags[i].name);
-		col = dc.plcolors[(m->tagset[m->seltags] & 1 << i) ? 3 : (urg & 1 << i ? 1 : (occ & 1 << i ? 2 : 0))];
+		col = dc.plcolors[(m->tagset[m->seltags] & 1 << i) ? 3 : (urg & 1 << i ? 1 : (occ & 1 << i ? 2 : 4))];
 		drawtext(tags[i].name, col, True);
 		dc.x += dc.w;
 
@@ -883,17 +898,22 @@ drawbar(Monitor *m) {
 	drawtext(plopensym, dc.plcolors[3], False);
 	dc.x += dc.w;
 
+	dc.w = textnw(rightlayoutsym, strlen(rightlayoutsym));
+	drawtext(rightlayoutsym, dc.plcolors[4], False);
+	dc.x += dc.w;
+
+
+	dc.w = textnw(leftlayoutsym, strlen(leftlayoutsym));
+	drawtext(leftlayoutsym, dc.plcolors[4], False);
+	dc.x += dc.w;
+
 
 	dc.w = blw = TEXTW(m->ltsymbol);
 	drawtext(m->ltsymbol, dc.plcolors[3], True);
 	dc.x += dc.w;
 
-    dc.w = textnw(plclosedsym, strlen(plclosedsym));
-	drawtext(plclosedsym, dc.plcolors[4], False);
-	dc.x += dc.w;
-
-	dc.w = textnw(layoutsym, strlen(layoutsym));
-	drawtext(layoutsym, dc.plcolors[4], False);
+    dc.w = textnw(rightlayoutsym, strlen(rightlayoutsym));
+	drawtext(rightlayoutsym, dc.plcolors[4], False);
 	dc.x += dc.w;
 
 	x = dc.x;
@@ -911,14 +931,15 @@ drawbar(Monitor *m) {
 			dc.x = x;
 			dc.w = m->ww - x;
 		}
-		drawcoloredtext(stext);
+        drawtext(stext, dc.plcolors[3], False);
+		//drawcoloredtext(stext);
 	}
 	else
 		dc.x = m->ww;
 	if((dc.w = dc.x - x) > bh) {
 		dc.x = x;
        if(m->sel) {
-         col = m == selmon ? dc.plcolors[3] : dc.plcolors[0];
+         col = m == selmon ? dc.plcolors[4] : dc.plcolors[0];
 		 drawtext(m->sel->name, col, True);
        }
        else
@@ -945,7 +966,7 @@ drawbars(void) {
 void
 drawcoloredtext(char *text) {
 	char *buf = text, *ptr = buf, c = 1;
-	XftColor *col = dc.plcolors[0];
+	XftColor *col = dc.plcolors[1];
 	int i, ox = dc.x;
 
 	while(*ptr) {
